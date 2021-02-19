@@ -14269,13 +14269,33 @@ eval("/*\n\nCopyright (c) 2012-2014 Jeffrey Mealo\n\nPermission is hereby grante
 
 /***/ }),
 
+/***/ "./src/data.js":
+/*!*********************!*\
+  !*** ./src/data.js ***!
+  \*********************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("const faker = __webpack_require__(/*! faker */ \"./node_modules/faker/index.js\");\n// console.log(faker.helpers.userCard());\n// console.log(faker.address.city());\n\nlet users, userDetails;\n\n// 13.\n// OPTIONAL - wrapping users and userDetails in a condition will keep fake data the same\nusers = JSON.parse(window.localStorage.getItem('users'));\nuserDetails = JSON.parse(window.localStorage.getItem('userDetails'));\n\nif (!users || !userDetails) {\n  //create an array of users\n  users = new Array(10).fill('').map((_) => faker.helpers.userCard());\n  window.localStorage.setItem('users', JSON.stringify(users));\n\n  userDetails = users.reduce((acc, user) => {\n    acc[user.name] = [\n      { username: user.username },\n      { email: user.email },\n      {\n        address: `${user.address.street} ${user.address.suite}, ${user.address.city}, ${user.address.zipcode}`,\n      },\n      { phone: user.phone },\n    ];\n    return acc;\n  }, {});\n  window.localStorage.setItem('userDetails', JSON.stringify(userDetails));\n}\n\nmodule.exports = {\n  users,\n  userDetails,\n};\n\n\n//# sourceURL=webpack://acme-users/./src/data.js?");
+
+/***/ }),
+
 /***/ "./src/index.js":
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("const faker = __webpack_require__(/*! faker */ \"./node_modules/faker/index.js\");\n// console.log(faker.helpers.userCard());\n// console.log(faker.address.city());\n\n//create an array of users\nconst users = new Array(10).fill('').map((_) => faker.helpers.userCard());\n\nconst userList = document.getElementById('user-list');\n\nconst userDetails = users.reduce((acc, user) => {\n  acc[user.name] = [\n    { username: user.username },\n    { email: user.email },\n    {\n      address: `${user.address.street} ${user.address.suite}, ${user.address.city}, ${user.address.zipcode}`,\n    },\n    { phone: user.phone },\n  ];\n  return acc;\n}, {});\n\n// console.log(users);\n// console.log(userDetails);\n\nlet curr = window.location.hash.slice(1) * 1;\n\nconst render = () => {\n  const html = `\n    ${users\n      .map(\n        (user, idx) => `\n      <li>\n        <a href='#${idx}'>${user.name}</a>\n        ${\n          curr === idx\n            ? `\n         <ul>\n        ${userDetails[user.name]\n          .map(\n            (detail) => `\n            <li>\n              ${JSON.stringify(detail).slice(1, -1).split('\"').join('')}\n            </li>\n            `\n          )\n          .join('')}\n        </ul>\n          `\n            : ''\n        }\n      </li>\n      `\n      )\n      .join('')}\n  `;\n  userList.innerHTML = html;\n};\n\nrender();\n\nwindow.addEventListener('hashchange', () => {\n  curr = window.location.hash.slice(1) * 1;\n  render();\n  console.log(curr);\n});\n\n\n//# sourceURL=webpack://acme-users/./src/index.js?");
+eval("const { users, userDetails } = __webpack_require__(/*! ./data */ \"./src/data.js\");\nconst render = __webpack_require__(/*! ./render */ \"./src/render.js\");\nconst userList = document.getElementById('user-list');\n\n// console.log(users);\n// console.log(userDetails);\n\nlet curr = window.location.hash.slice(1) * 1;\n\nconst _render = () => {\n  //this func has been wrapped in _render function to reduce repeition of code\n  render({ users, userDetails, userList, curr });\n};\n\n_render();\n\nwindow.addEventListener('hashchange', () => {\n  curr = window.location.hash.slice(1) * 1;\n  _render();\n  console.log(curr);\n});\n\n\n//# sourceURL=webpack://acme-users/./src/index.js?");
+
+/***/ }),
+
+/***/ "./src/render.js":
+/*!***********************!*\
+  !*** ./src/render.js ***!
+  \***********************/
+/***/ ((module) => {
+
+eval("// place args in object so order doesn't matter\nconst render = ({ users, userDetails, userList, curr }) => {\n  const html = `\n    ${users\n      .map(\n        (user, idx) => `\n      <li>\n        <a href='#${idx}'>${user.name}</a>\n        ${\n          curr === idx\n            ? `\n         <ul>\n        ${userDetails[user.name]\n          .map(\n            (detail) => `\n            <li>\n              ${JSON.stringify(detail).slice(1, -1).split('\"').join('')}\n            </li>\n            `\n          )\n          .join('')}\n        </ul>\n          `\n            : ''\n        }\n      </li>\n      `\n      )\n      .join('')}\n  `;\n  userList.innerHTML = html;\n};\n\nmodule.exports = render;\n\n\n//# sourceURL=webpack://acme-users/./src/render.js?");
 
 /***/ })
 
